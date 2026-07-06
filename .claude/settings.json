@@ -16,9 +16,18 @@
       "Bash(go test:*)"
     ],
     "deny": [
+      "Read(.mcp.json)",
+      "Write(.mcp.json)",
+      "Edit(.mcp.json)",
+      "MultiEdit(.mcp.json)",
+      "Read(.env*)",
+      "Write(.env*)",
+      "Edit(.env*)",
       "Bash(rm -rf:*)",
       "Bash(curl * | sh:*)",
+      "Bash(curl * | bash:*)",
       "Bash(wget * | sh:*)",
+      "Bash(wget * | bash:*)",
       "Bash(printenv:*)",
       "Bash(env:*)"
     ]
@@ -31,6 +40,15 @@
           {
             "type": "command",
             "command": ".claude/hooks/block-sensitive-writes.sh"
+          }
+        ]
+      },
+      {
+        "matcher": "Bash",
+        "hooks": [
+          {
+            "type": "command",
+            "command": ".claude/hooks/block-dangerous-bash.sh"
           }
         ]
       }
