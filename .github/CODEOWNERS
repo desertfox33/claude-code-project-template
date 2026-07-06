@@ -1,0 +1,9 @@
+# Repository ownership
+# Keep public contributions reviewable by the repository owner.
+
+/ @desertfox33
+.github/ @desertfox33
+.claude/hooks/ @desertfox33
+.claude/skills/ @desertfox33
+.claude/agents/ @desertfox33
+.mcp.json @desertfox33

@@ -1,0 +1,55 @@
+# Local Claude Code overrides
+CLAUDE.local.md
+.claude/settings.local.json
+settings.local.json
+
+# Secrets and environment files
+.env
+.env.*
+!.env.example
+*.pem
+*.key
+*.p12
+*.pfx
+*.crt
+*.cer
+*.der
+*.kdbx
+id_rsa
+id_rsa.pub
+id_ed25519
+id_ed25519.pub
+*_rsa
+*_ed25519
+*.asc
+*.gpg
+
+# Cloud and tool credentials
+.aws/
+.azure/
+.gcloud/
+.npmrc
+.pypirc
+.netrc
+
+# OS/editor files
+.DS_Store
+Thumbs.db
+.vscode/
+.idea/
+
+# Logs and build outputs
+*.log
+logs/
+dist/
+build/
+coverage/
+node_modules/
+__pycache__/
+.pytest_cache/
+.cache/
+
+# Temporary files
+*.tmp
+*.bak
+*.swp
