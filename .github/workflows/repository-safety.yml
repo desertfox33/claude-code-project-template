@@ -1,0 +1,28 @@
+name: Repository Safety Check
+
+on:
+  pull_request:
+  push:
+    branches:
+      - main
+
+permissions:
+  contents: read
+
+jobs:
+  repo-safety:
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: Checkout repository
+        uses: actions/checkout@v4
+
+      - name: Run repository safety check
+        run: |
+          chmod +x scripts/check-repo-safety.sh
+          ./scripts/check-repo-safety.sh
+
+      - name: Validate shell scripts
+        run: |
+          bash -n scripts/check-repo-safety.sh
+          find .claude/hooks -type f -name "*.sh" -print0 | xargs -0 -r bash -n

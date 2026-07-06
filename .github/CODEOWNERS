@@ -1,9 +1,17 @@
 # Repository ownership
 # Keep public contributions reviewable by the repository owner.
 
+# Repository ownership
 / @desertfox33
+
+# Security-sensitive automation and Claude behavior
 .github/ @desertfox33
+.github/workflows/ @desertfox33
 .claude/hooks/ @desertfox33
 .claude/skills/ @desertfox33
 .claude/agents/ @desertfox33
-.mcp.json @desertfox33
+.claude/settings.json @desertfox33
+.mcp.example.json @desertfox33
+scripts/ @desertfox33
+SECURITY.md @desertfox33
+.gitignore @desertfox33

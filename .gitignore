@@ -3,6 +3,11 @@ CLAUDE.local.md
 .claude/settings.local.json
 settings.local.json
 
+
+#local MCP configuration
+.mcp.json
+
+
 # Secrets and environment files
 .env
 .env.*
