@@ -19,10 +19,10 @@ jobs:
 
       - name: Run repository safety check
         run: |
-          chmod +x scripts/check-repo-safety.sh
-          ./scripts/check-repo-safety.sh
+          chmod +x check-repo-safety.sh
+          ./check-repo-safety.sh
 
       - name: Validate shell scripts
         run: |
-          bash -n scripts/check-repo-safety.sh
+          bash -n check-repo-safety.sh
           find .claude/hooks -type f -name "*.sh" -print0 | xargs -0 -r bash -n
