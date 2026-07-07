@@ -1,55 +1,53 @@
 #!/usr/bin/env bash
 set -euo pipefail
 
-fail=0
+FAILED=0
 
-report() {
-  echo "ERROR: $*" >&2
-  fail=1
-}
+SECRET_FINDINGS="/tmp/repo-safety-secret-findings.txt"
+RISKY_FINDINGS="/tmp/repo-safety-risky-shell-findings.txt"
 
-warn() {
-  echo "WARN: $*" >&2
-}
+rm -f "$SECRET_FINDINGS" "$RISKY_FINDINGS"
 
-# Files that should never be committed to this public template.
-blocked_paths=(
-  ".mcp.json"
-  "CLAUDE.local.md"
-  ".claude/settings.local.json"
-  ".env"
+echo "Running repository safety checks..."
+
+# Files that intentionally contain security patterns or dangerous-looking strings.
+# These are control files, not findings.
+EXCLUDES=(
+  ':!.git'
+  ':!check-repo-safety.sh'
+  ':!.github/workflows/repository-safety.yml'
+  ':!.claude/hooks/block-dangerous-bash.sh'
+  ':!.claude/settings.json'
 )
 
-for path in "${blocked_paths[@]}"; do
-  if [ -e "$path" ]; then
-    report "Local-only or sensitive file is committed/present: $path"
-  fi
-done
+echo "Checking for secret-like content..."
 
-# Private key and credential-like files.
-while IFS= read -r -d '' file; do
-  report "Private-key or credential-like file found: $file"
-done < <(
-  find . \
-    -path ./.git -prune -o \
-    \( -name "*.pem" -o -name "*.key" -o -name "*.p12" -o -name "*.pfx" -o -name "id_rsa" -o -name "id_ed25519" \) \
-    -print0
-)
+SECRET_PATTERN='AKIA[0-9A-Z]{16}|BEGIN (RSA|OPENSSH|EC|DSA)? ?PRIVATE KEY|ghp_[A-Za-z0-9_]{20,}|github_pat_[A-Za-z0-9_]{20,}|GITHUB_TOKEN=|AWS_SECRET_ACCESS_KEY=|AWS_ACCESS_KEY_ID=|SLACK_BOT_TOKEN=|xox[baprs]-[A-Za-z0-9-]+'
 
-# Obvious secret markers. This is not a replacement for GitHub secret scanning.
-if git grep -nE '(AKIA[0-9A-Z]{16}|BEGIN (RSA|OPENSSH|EC|DSA)? ?PRIVATE KEY|ghp_[A-Za-z0-9_]{20,}|GITHUB_TOKEN=|AWS_SECRET_ACCESS_KEY=)' -- . ':!.git' >/tmp/repo-safety-findings.txt 2>/dev/null; then
-  cat /tmp/repo-safety-findings.txt >&2
-  report "Potential secret-like content found."
+if git grep -nE "$SECRET_PATTERN" -- . "${EXCLUDES[@]}" > "$SECRET_FINDINGS" 2>/dev/null; then
+  echo "ERROR: Potential secret-like content found."
+  cat "$SECRET_FINDINGS"
+  FAILED=1
+else
+  echo "OK: No secret-like content found."
 fi
 
-# Risky shell patterns in automation.
-if git grep -nE 'curl .*\| *(sh|bash)|wget .*\| *(sh|bash)|rm -rf /|chmod 777|sudo ' -- .claude scripts .github 2>/dev/null; then
-  report "Risky shell pattern found in automation paths."
+echo "Checking for risky shell patterns..."
+
+RISKY_PATTERN='rm -rf /|rm -rf /\*|chmod 777|curl .*\| *sh|curl .*\| *bash|wget .*\| *sh|wget .*\| *bash|sudo '
+
+if git grep -nE "$RISKY_PATTERN" -- . "${EXCLUDES[@]}" > "$RISKY_FINDINGS" 2>/dev/null; then
+  echo "ERROR: Risky shell pattern found outside approved safety-control files."
+  cat "$RISKY_FINDINGS"
+  FAILED=1
+else
+  echo "OK: No risky shell patterns found outside approved safety-control files."
 fi
 
-if [ "$fail" -ne 0 ]; then
-  echo "Repository safety check failed." >&2
+if [[ "$FAILED" -ne 0 ]]; then
+  echo "Repository safety check failed."
   exit 1
 fi
 
 echo "Repository safety check passed."
+exit 0
