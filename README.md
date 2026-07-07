@@ -54,10 +54,8 @@ claude-code-project-template/
 │   ├── memory/
 │   └── workflows/
 ├── scripts/
-│   ├── check-repo-safety.sh
 │   └── init-local.sh
-└── blog/
-    └── devto-claude-code-project-setup.md
+|--- check-repo-safety.sh
 ```
 
 ---
